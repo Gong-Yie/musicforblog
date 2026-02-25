@@ -4,5 +4,23 @@
     "artist": "Musical_Akt",
     "url": "music/【洛天依原创曲】你好·再见·我爱你.mp3", 
     "cover": "cover/你好·再见·我爱你.jpg"
+  },
+  {
+    "name": "洛天依Official,COP - 三杯空城",
+    "artist": "COP",
+    "url": "music/洛天依Official,COP - 三杯空城.mp3", 
+    "cover": "cover/三杯空城.jpg"
+  },
+  {
+    "name": "三千年夜行灯",
+    "artist": "COP",
+    "url": "music/三千年夜行灯.mp3", 
+    "cover": "cover/三千年夜行灯.jpg"
+  },
+  {
+    "name": "MoreanP - 与你相遇，三生有幸",
+    "artist": "MoreanP",
+    "url": "music/MoreanP - 与你相遇，三生有幸.mp3", 
+    "cover": "cover/与你相遇，三生有幸.jpg"
   }
 ]
