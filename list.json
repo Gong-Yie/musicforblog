@@ -2,31 +2,43 @@
   {
     "name": "【洛天依原创曲】你好·再见·我爱你",
     "artist": "Musical_Akt",
-    "url": "music/【洛天依原创曲】你好·再见·我爱你.mp3", 
+    "url": "music/【洛天依原创曲】你好·再见·我爱你.mp3",
     "cover": "cover/你好·再见·我爱你.jpg"
   },
   {
     "name": "洛天依Official,COP - 三杯空城",
     "artist": "COP",
-    "url": "music/洛天依Official,COP - 三杯空城.mp3", 
+    "url": "music/洛天依Official,COP - 三杯空城.mp3",
     "cover": "cover/三杯空城.jpg"
   },
   {
     "name": "三千年夜行灯",
     "artist": "COP",
-    "url": "music/三千年夜行灯.mp3", 
+    "url": "music/三千年夜行灯.mp3",
     "cover": "cover/三千年夜行灯.jpg"
   },
   {
     "name": "【心华】 咏春",
     "artist": "折v折微微",
-    "url": "music/【心华】 咏春.mp3", 
+    "url": "music/【心华】 咏春.mp3",
     "cover": "cover/詠春.jpg"
+  },
+  {
+    "name": "洛天依 - 如戏",
+    "artist": "芹菜猪肉大馄饨",
+    "url": "music/洛天依 - 如戏.mp3",
+    "cover": "cover/如戏.jpg"
+  },
+  {
+    "name": "言和,乐正绫 - 三月雨",
+    "artist": "OQQ君",
+    "url": "music/言和,乐正绫 - 三月雨.mp3",
+    "cover": "cover/【言和乐正绫】三月雨【调教：OQQ君】【Pv附】_cover.jpg"
   },
   {
     "name": "MoreanP - 与你相遇，三生有幸",
     "artist": "MoreanP",
-    "url": "music/MoreanP - 与你相遇，三生有幸.mp3", 
+    "url": "music/MoreanP - 与你相遇，三生有幸.mp3",
     "cover": "cover/与你相遇，三生有幸.jpg"
   }
 ]

@@ -1,354 +1,1655 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>博客音乐存储</title>
+    <title>洛天依博客音乐台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <style>
-        /* 样式保持不变，与之前相同 */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        :root {
+            --ty-ink: #142032;
+            --ty-muted: #667085;
+            --ty-line: rgba(20, 32, 50, 0.12);
+            --ty-cyan: #66ccff;
+            --ty-blue: #315aff;
+            --ty-rose: #ff6f9f;
+            --ty-lemon: #d9f85f;
+            --ty-cover: url("cover/你好·再见·我爱你.jpg");
+            --ty-cover-scale: 1;
+            --ty-glow: 0.24;
+        }
+
         body {
-            background: linear-gradient(145deg, #f0f2f5 0%, #e0e5ec 100%);
-            min-height: 100vh; display: flex; justify-content: center; align-items: center;
-            font-family: 'Segoe UI', Roboto, sans-serif; padding: 16px;
+            display: block;
+            align-items: initial;
+            justify-content: initial;
+            padding: 0;
+            overflow-x: hidden;
+            color: var(--ty-ink);
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.98), rgba(244,253,255,0.96) 36%, rgba(255,247,251,0.95) 74%, rgba(249,255,243,0.92)),
+                linear-gradient(90deg, rgba(102,204,255,0.16), rgba(255,111,159,0.1), rgba(217,248,95,0.12));
+            font-family: "Outfit", "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
         }
-        .music-player {
-            max-width: 500px; width: 100%; background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(20px); border-radius: 40px;
-            box-shadow: 20px 20px 40px rgba(0,0,0,0.1), -10px -10px 30px rgba(255,255,255,0.7);
-            padding: 24px 20px 30px; border: 1px solid rgba(255,255,255,0.5);
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(20,32,50,0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(20,32,50,0.045) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.82), transparent 78%);
         }
-        .cover-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; }
-        .cover-image {
-            width: 220px; height: 220px; border-radius: 30px; object-fit: cover;
-            box-shadow: 8px 8px 20px rgba(0,0,0,0.15), -4px -4px 12px #ffffff;
-            background: #d9dee6; border: 3px solid rgba(255,255,255,0.5);
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(102,204,255,0.18), transparent 34%),
+                radial-gradient(circle at 98% 48%, rgba(255,111,159,0.12), transparent 30%);
         }
-        .track-info { text-align: center; margin-top: 18px; }
-        .track-title { font-size: 1.6rem; font-weight: 600; color: #1e2b3c; line-height: 1.2; }
-        .track-artist { font-size: 1.1rem; color: #4a5b6e; margin-top: 6px; opacity: 0.8; }
-        .progress-area { margin: 24px 0 16px; }
-        .time-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: #3e4c5d; margin-bottom: 8px; }
-        .seek-bar {
-            width: 100%; height: 7px; border-radius: 30px; background: rgba(0,0,0,0.1);
-            outline: none; -webkit-appearance: none; box-shadow: inset 2px 2px 5px #b8b9be, inset -3px -3px 6px #ffffff;
+
+        .tianyi-shell {
+            width: min(1240px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 18px 0 28px;
         }
-        .seek-bar::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 18px; height: 18px; background: #2f4050;
-            border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.2), 0 0 0 2px #ecf0f3; cursor: pointer;
+
+        .tianyi-nav {
+            position: sticky;
+            top: 18px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            width: min(940px, 100%);
+            margin: 0 auto;
+            padding: 10px 12px 10px 16px;
+            background: rgba(255,255,255,0.78);
+            border: 1px solid var(--ty-line);
+            border-radius: 8px;
+            box-shadow: 0 16px 50px rgba(20,32,50,0.1);
+            backdrop-filter: blur(18px);
         }
-        .control-buttons {
-            display: flex; justify-content: center; align-items: center; gap: 24px; margin: 24px 0 18px;
+
+        .tianyi-brand,
+        .tianyi-nav-links,
+        .tianyi-status,
+        .tianyi-btn {
+            display: inline-flex;
+            align-items: center;
         }
-        .ctrl-btn {
-            background: rgba(240, 244, 250, 0.7); border: none; width: 58px; height: 58px;
-            border-radius: 40px; font-size: 1.8rem; color: #2f4050;
-            box-shadow: 6px 6px 12px rgba(0,0,0,0.08), -6px -6px 12px #ffffff;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px);
+
+        .tianyi-brand {
+            gap: 10px;
+            min-width: 0;
+            color: var(--ty-ink);
+            font-weight: 800;
         }
-        .ctrl-btn:active { box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; }
-        .ctrl-btn.play-pause { width: 72px; height: 72px; background: #2f4050; color: white; }
-        .volume-wrapper {
-            display: flex; align-items: center; gap: 12px; margin: 10px 0 20px;
-            background: rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 60px;
-            box-shadow: inset 1px 1px 4px #b5b9c0, inset -2px -2px 4px #ffffff;
+
+        .tianyi-mark {
+            display: grid;
+            place-items: center;
+            width: 32px;
+            height: 32px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--ty-cyan), var(--ty-blue));
+            border-radius: 50%;
+            box-shadow: 0 10px 24px rgba(102,204,255,0.28);
         }
-        .volume-wrapper i { color: #3a4a5a; font-size: 1.3rem; width: 24px; }
-        .volume-bar {
-            flex: 1; height: 6px; border-radius: 20px; background: rgba(0,0,0,0.1);
-            -webkit-appearance: none; box-shadow: inset 1px 1px 3px #a0a5af;
+
+        .tianyi-nav-links {
+            gap: 6px;
         }
-        .volume-bar::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 16px; height: 16px; background: #2f4050; border-radius: 50%; cursor: pointer;
+
+        .tianyi-nav-links a,
+        .tianyi-status {
+            min-height: 36px;
+            padding: 0 12px;
+            color: rgba(20,32,50,0.72);
+            background: rgba(255,255,255,0.55);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
         }
-        .playlist {
-            margin-top: 26px; background: rgba(240, 244, 250, 0.3); border-radius: 30px;
-            padding: 16px 12px; backdrop-filter: blur(8px);
-            box-shadow: inset 0 1px 3px #ffffff, 0 10px 15px -8px rgba(0,0,0,0.2);
+
+        .tianyi-nav-links a:hover,
+        .tianyi-status {
+            color: var(--ty-ink);
+            border-color: var(--ty-line);
+            background: rgba(255,255,255,0.9);
         }
-        .playlist h4 {
-            font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;
-            color: #2b3d4e; margin-bottom: 16px; font-weight: 500; padding-left: 8px;
+
+        .tianyi-status {
+            gap: 8px;
         }
-        .playlist-items {
-            list-style: none; max-height: 200px; overflow-y: auto; padding-right: 6px;
-            scrollbar-width: thin; scrollbar-color: #9aa9b8 #e0e5ec;
+
+        .tianyi-status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--ty-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 0 6px rgba(102,204,255,0.16);
         }
-        .playlist-items::-webkit-scrollbar { width: 5px; }
-        .playlist-items::-webkit-scrollbar-track { background: #d0d8e2; border-radius: 10px; }
-        .playlist-items::-webkit-scrollbar-thumb { background: #7b8b9f; border-radius: 10px; }
-        .playlist-item {
-            display: flex; align-items: center; gap: 14px; padding: 12px 16px; margin-bottom: 6px;
-            background: rgba(255,255,255,0.4); border-radius: 50px;
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.05), -2px -2px 6px #ffffff;
-            cursor: pointer; transition: all 0.15s; border: 1px solid rgba(255,255,255,0.3);
+
+        body.ty-playing .tianyi-status-dot {
+            animation: tyStatusBeat 900ms ease-in-out infinite;
         }
-        .playlist-item.active { background: #2f4050; box-shadow: 0 5px 12px rgba(0,0,0,0.2); border-color: #ffffff80; }
-        .playlist-item.active .item-title,
-        .playlist-item.active .item-artist { color: white; }
-        .item-cover-thumb {
-            width: 40px; height: 40px; border-radius: 30px; object-fit: cover;
-            background: #b0c0d0; border: 2px solid white;
+
+        .tianyi-hero {
+            min-height: calc(100svh - 90px);
+            display: grid;
+            grid-template-columns: minmax(0, 0.95fr) minmax(330px, 1.05fr);
+            align-items: center;
+            gap: 48px;
+            padding: 72px 0 96px;
         }
-        .item-info { flex: 1; }
-        .item-title { font-weight: 600; color: #1f2e3c; font-size: 0.98rem; }
-        .item-artist { font-size: 0.8rem; color: #4f6275; }
-        footer {
-            text-align: center; margin-top: 12px; color: #6e7e90;
-            font-size: 0.75rem; opacity: 0.7;
+
+        .tianyi-title {
+            max-width: min(1120px, 100%);
+            color: var(--ty-ink);
+            font-size: clamp(3rem, 6.6vw, 5.75rem);
+            line-height: 0.98;
+            font-weight: 800;
         }
-        a { color: #2f4050; text-decoration: none; }
+
+        .tianyi-inline-cover {
+            display: inline-block;
+            width: 128px;
+            height: 58px;
+            margin: 0 12px;
+            vertical-align: middle;
+            background-image: var(--ty-cover);
+            background-position: center;
+            background-size: cover;
+            border: 2px solid rgba(255,255,255,0.86);
+            border-radius: 999px;
+            box-shadow: 0 14px 34px rgba(20,32,50,0.18);
+            transform: translateY(-4px);
+        }
+
+        .tianyi-lede {
+            max-width: 640px;
+            margin-top: 24px;
+            color: rgba(20,32,50,0.7);
+            font-size: 1.12rem;
+            line-height: 1.85;
+        }
+
+        .tianyi-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .tianyi-btn {
+            justify-content: center;
+            gap: 10px;
+            min-height: 46px;
+            padding: 0 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+        }
+
+        .tianyi-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .tianyi-btn.primary {
+            color: #fff;
+            background: #111827;
+            box-shadow: 0 18px 36px rgba(17,24,39,0.18);
+        }
+
+        .tianyi-btn.secondary {
+            color: var(--ty-ink);
+            background: rgba(255,255,255,0.82);
+            border: 1px solid var(--ty-line);
+        }
+
+        .tianyi-stage {
+            position: relative;
+            overflow: hidden;
+            padding: 16px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.84), rgba(255,255,255,0.62)),
+                linear-gradient(135deg, rgba(102,204,255,0.14), rgba(255,111,159,0.12));
+            border: 1px solid rgba(255,255,255,0.78);
+            border-radius: 8px;
+            box-shadow: 0 24px 80px rgba(20,32,50,0.14);
+            backdrop-filter: blur(22px);
+        }
+
+        .tianyi-stage::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            pointer-events: none;
+            background:
+                linear-gradient(115deg, transparent 0 24%, rgba(255,255,255,0.72) 36%, transparent 52%),
+                repeating-linear-gradient(90deg, rgba(20,32,50,0.05) 0 1px, transparent 1px 42px);
+            opacity: 0.45;
+            mix-blend-mode: screen;
+        }
+
+        .tianyi-player {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(220px, 0.92fr) minmax(0, 1.08fr);
+            gap: 18px;
+        }
+
+        .tianyi-cover-shell {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            background: #d8f7fb;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 22px 45px rgba(20,32,50,0.16);
+            transform: scale(var(--ty-cover-scale));
+            transition: transform 120ms linear;
+            isolation: isolate;
+        }
+
+        .tianyi-cover-shell::before,
+        .tianyi-cover-shell::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .tianyi-cover-shell::before {
+            background:
+                linear-gradient(135deg, rgba(102,204,255,0.14), transparent 42%),
+                linear-gradient(315deg, rgba(255,111,159,0.14), transparent 48%);
+            mix-blend-mode: screen;
+        }
+
+        .tianyi-cover-shell::after {
+            opacity: var(--ty-glow);
+            background:
+                linear-gradient(90deg, transparent, rgba(255,255,255,0.68), transparent),
+                repeating-linear-gradient(180deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 8px);
+            transform: translateX(-70%);
+        }
+
+        body.ty-playing .tianyi-cover-shell::after {
+            animation: tyScanLine 2.2s ease-in-out infinite;
+        }
+
+        .tianyi-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(1.08) contrast(1.04);
+        }
+
+        .tianyi-ring {
+            position: absolute;
+            inset: 10px;
+            z-index: 3;
+            pointer-events: none;
+            border: 1px solid rgba(255,255,255,0.74);
+            border-radius: 8px;
+            opacity: 0;
+        }
+
+        body.ty-playing .tianyi-ring {
+            animation: tyRingPulse 1.7s ease-in-out infinite;
+        }
+
+        .tianyi-visualizer {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            z-index: 4;
+            display: grid;
+            grid-template-columns: repeat(28, 1fr);
+            align-items: end;
+            gap: 4px;
+            height: 76px;
+            padding: 10px;
+            background: rgba(8,14,28,0.28);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 8px;
+            backdrop-filter: blur(12px);
+        }
+
+        .tianyi-visualizer span {
+            display: block;
+            height: 100%;
+            min-height: 10px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, var(--ty-lemon), var(--ty-cyan) 44%, var(--ty-rose));
+            transform: scaleY(var(--level, 0.18));
+            transform-origin: bottom;
+            opacity: 0.9;
+            transition: transform 70ms linear;
+        }
+
+        body:not(.ty-playing) .tianyi-visualizer span {
+            animation: tyIdleBars 1.8s ease-in-out infinite;
+            animation-delay: calc(var(--i) * 55ms);
+        }
+
+        .tianyi-controls {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-width: 0;
+            gap: 18px;
+            padding: 8px 4px 4px;
+        }
+
+        .tianyi-track-title {
+            overflow-wrap: anywhere;
+            color: var(--ty-ink);
+            font-size: 2.15rem;
+            line-height: 1.08;
+            font-weight: 800;
+        }
+
+        .tianyi-track-artist {
+            margin-top: 10px;
+            color: var(--ty-muted);
+            font-size: 1.05rem;
+        }
+
+        .tianyi-progress {
+            display: grid;
+            gap: 10px;
+        }
+
+        .tianyi-time {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(20,32,50,0.68);
+            font-size: 0.92rem;
+        }
+
+        .tianyi-seek,
+        .tianyi-volume {
+            width: 100%;
+            height: 8px;
+            border-radius: 999px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, var(--ty-cyan) 0 var(--range-value, 0%), rgba(20,32,50,0.12) var(--range-value, 0%) 100%);
+        }
+
+        .tianyi-volume {
+            --range-value: 80%;
+        }
+
+        .tianyi-seek::-webkit-slider-thumb,
+        .tianyi-volume::-webkit-slider-thumb {
+            width: 18px;
+            height: 18px;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            background: #111827;
+            box-shadow: 0 6px 18px rgba(17,24,39,0.28);
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .tianyi-buttons {
+            display: grid;
+            grid-template-columns: 54px 72px 54px;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .tianyi-icon-btn {
+            display: grid;
+            place-items: center;
+            width: 54px;
+            height: 54px;
+            color: var(--ty-ink);
+            background: rgba(255,255,255,0.78);
+            border: 1px solid var(--ty-line);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 12px 26px rgba(20,32,50,0.1);
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+
+        .tianyi-icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 30px rgba(20,32,50,0.14);
+        }
+
+        .tianyi-icon-btn.play {
+            width: 72px;
+            height: 72px;
+            color: #fff;
+            background: linear-gradient(135deg, #111827, #243757);
+            border-color: rgba(255,255,255,0.4);
+            box-shadow: 0 22px 46px rgba(17,24,39,0.26);
+        }
+
+        body.ty-playing .tianyi-icon-btn.play {
+            animation: tyPlayGlow 1.2s ease-in-out infinite;
+        }
+
+        .tianyi-volume-box {
+            display: grid;
+            grid-template-columns: 24px minmax(0, 1fr);
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.68);
+            border: 1px solid var(--ty-line);
+            border-radius: 8px;
+        }
+
+        .tianyi-playlist {
+            display: grid;
+            gap: 12px;
+        }
+
+        .tianyi-playlist-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: rgba(20,32,50,0.72);
+            font-size: 0.96rem;
+            font-weight: 700;
+        }
+
+        .tianyi-count {
+            color: var(--ty-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .tianyi-list {
+            display: grid;
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 4px;
+            list-style: none;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(20,32,50,0.28) transparent;
+        }
+
+        .tianyi-list-item {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 46px minmax(0, 1fr) 26px;
+            align-items: center;
+            gap: 12px;
+            min-height: 62px;
+            padding: 8px;
+            color: var(--ty-ink);
+            text-align: left;
+            background: rgba(255,255,255,0.72);
+            border: 1px solid rgba(20,32,50,0.08);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+        }
+
+        .tianyi-list-item:hover {
+            transform: translateX(2px);
+            background: rgba(255,255,255,0.92);
+            box-shadow: 0 12px 28px rgba(20,32,50,0.09);
+        }
+
+        .tianyi-list-item.active {
+            color: #fff;
+            background: linear-gradient(135deg, #111827, #25385c);
+            border-color: rgba(255,255,255,0.28);
+        }
+
+        .tianyi-thumb {
+            width: 46px;
+            height: 46px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.72);
+            transition: transform 700ms ease;
+        }
+
+        .tianyi-list-item:hover .tianyi-thumb {
+            transform: scale(1.05);
+        }
+
+        .tianyi-info {
+            min-width: 0;
+        }
+
+        .tianyi-song,
+        .tianyi-artist {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tianyi-song {
+            font-size: 0.98rem;
+            font-weight: 700;
+        }
+
+        .tianyi-artist {
+            margin-top: 3px;
+            color: rgba(20,32,50,0.58);
+            font-size: 0.84rem;
+        }
+
+        .tianyi-list-item.active .tianyi-artist {
+            color: rgba(255,255,255,0.68);
+        }
+
+        .tianyi-list-item.active .tianyi-wave {
+            color: var(--ty-lemon);
+        }
+
+        .tianyi-empty {
+            padding: 18px;
+            color: var(--ty-muted);
+            background: rgba(255,255,255,0.62);
+            border: 1px solid var(--ty-line);
+            border-radius: 8px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .tianyi-marquee {
+            width: 100%;
+            overflow: hidden;
+            margin-top: 30px;
+            padding: 12px 0;
+            border-top: 1px solid var(--ty-line);
+            border-bottom: 1px solid var(--ty-line);
+            mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+        }
+
+        .tianyi-marquee-track {
+            display: flex;
+            width: max-content;
+            gap: 18px;
+            color: rgba(20,32,50,0.56);
+            animation: tyMarquee 26s linear infinite;
+        }
+
+        .tianyi-marquee-track span {
+            display: inline-flex;
+            align-items: center;
+            gap: 18px;
+            white-space: nowrap;
+            font-weight: 700;
+        }
+
+        .tianyi-marquee-track span::after {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: var(--ty-rose);
+            border-radius: 50%;
+        }
+
+        .tianyi-section,
+        .tianyi-footer {
+            padding: 120px 0;
+        }
+
+        .tianyi-section-title {
+            max-width: 860px;
+            color: var(--ty-ink);
+            font-size: clamp(2.35rem, 4.6vw, 3.45rem);
+            line-height: 1.02;
+            font-weight: 800;
+        }
+
+        .tianyi-copy {
+            max-width: 620px;
+            margin-top: 18px;
+            color: rgba(20,32,50,0.68);
+            font-size: 1.05rem;
+            line-height: 1.85;
+        }
+
+        .tianyi-bento {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            grid-auto-flow: dense;
+            gap: 12px;
+            margin-top: 34px;
+        }
+
+        .tianyi-card {
+            position: relative;
+            overflow: hidden;
+            min-height: 180px;
+            padding: 22px;
+            background: rgba(255,255,255,0.72);
+            border: 1px solid var(--ty-line);
+            border-radius: 8px;
+            box-shadow: 0 18px 44px rgba(20,32,50,0.08);
+        }
+
+        .tianyi-card h3 {
+            position: relative;
+            z-index: 1;
+            color: var(--ty-ink);
+            font-size: 1.35rem;
+        }
+
+        .tianyi-card p {
+            position: relative;
+            z-index: 1;
+            margin-top: 10px;
+            color: rgba(20,32,50,0.68);
+            line-height: 1.7;
+        }
+
+        .ty-span-6 { grid-column: span 6; }
+        .ty-span-4 { grid-column: span 4; }
+        .ty-span-3 { grid-column: span 3; }
+
+        .tianyi-feature-cover {
+            min-height: 250px;
+            color: #fff;
+            background-image:
+                linear-gradient(180deg, rgba(17,24,39,0.2), rgba(17,24,39,0.72)),
+                var(--ty-cover);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .tianyi-feature-cover h3,
+        .tianyi-feature-cover p {
+            color: #fff;
+        }
+
+        .tianyi-metric {
+            display: block;
+            margin-top: 24px;
+            color: var(--ty-cyan);
+            font-size: 3.4rem;
+            line-height: 1;
+            font-weight: 800;
+        }
+
+        .tianyi-mini-covers {
+            position: absolute;
+            right: 18px;
+            bottom: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tianyi-mini-covers img {
+            width: 54px;
+            height: 54px;
+            object-fit: cover;
+            margin-left: -12px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 12px 22px rgba(20,32,50,0.16);
+        }
+
+        .tianyi-motion-grid {
+            display: grid;
+            grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
+            gap: 28px;
+            margin-top: 38px;
+        }
+
+        .tianyi-motion-copy {
+            align-self: start;
+            padding: 28px;
+            color: #fff;
+            background: rgba(17,24,39,0.94);
+            border-radius: 8px;
+        }
+
+        .tianyi-motion-copy h2 {
+            color: #fff;
+            font-size: 2.75rem;
+            line-height: 1.04;
+        }
+
+        .tianyi-motion-copy p {
+            margin-top: 16px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+
+        .tianyi-accordion {
+            display: grid;
+            gap: 12px;
+        }
+
+        .tianyi-accordion-card {
+            display: grid;
+            grid-template-columns: 110px minmax(0, 1fr);
+            gap: 18px;
+            min-height: 150px;
+            padding: 12px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.72);
+            border: 1px solid var(--ty-line);
+            border-radius: 8px;
+            transition: grid-template-columns 360ms ease, transform 220ms ease, background 220ms ease;
+        }
+
+        .tianyi-accordion-card:hover {
+            grid-template-columns: 170px minmax(0, 1fr);
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.92);
+        }
+
+        .tianyi-accordion-card img {
+            width: 100%;
+            height: 126px;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: transform 700ms ease;
+        }
+
+        .tianyi-accordion-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .tianyi-accordion-card h3 {
+            color: var(--ty-ink);
+            margin-top: 4px;
+            font-size: 1.15rem;
+        }
+
+        .tianyi-accordion-card p {
+            margin-top: 8px;
+            color: rgba(20,32,50,0.65);
+            line-height: 1.65;
+        }
+
+        .tianyi-footer {
+            text-align: center;
+        }
+
+        .tianyi-footer-panel {
+            padding: 42px 20px;
+            color: #fff;
+            background: linear-gradient(135deg, rgba(17,24,39,0.96), rgba(29,47,77,0.94));
+            border-radius: 8px;
+            box-shadow: 0 24px 70px rgba(17,24,39,0.24);
+        }
+
+        .tianyi-footer-panel h2 {
+            color: #fff;
+            font-size: clamp(2.35rem, 4.6vw, 3rem);
+            line-height: 1.05;
+        }
+
+        .tianyi-footer-panel p {
+            max-width: 640px;
+            margin: 14px auto 0;
+            color: rgba(255,255,255,0.72);
+            line-height: 1.8;
+        }
+
+        .tianyi-footer-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .tianyi-footer-actions .primary {
+            color: #111827;
+            background: #fff;
+        }
+
+        .tianyi-footer-actions .secondary {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.22);
+        }
+
+        .tianyi-credit {
+            margin-top: 20px;
+            color: rgba(255,255,255,0.52);
+            font-size: 0.92rem;
+        }
+
+        @keyframes tyStatusBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.35); }
+        }
+
+        @keyframes tyScanLine {
+            0% { transform: translateX(-75%); }
+            52%, 100% { transform: translateX(75%); }
+        }
+
+        @keyframes tyRingPulse {
+            0% { opacity: 0.64; transform: scale(0.92); }
+            100% { opacity: 0; transform: scale(1.08); }
+        }
+
+        @keyframes tyIdleBars {
+            0%, 100% { transform: scaleY(0.18); }
+            50% { transform: scaleY(0.58); }
+        }
+
+        @keyframes tyPlayGlow {
+            0%, 100% { box-shadow: 0 22px 46px rgba(17,24,39,0.26), 0 0 0 rgba(102,204,255,0); }
+            50% { box-shadow: 0 22px 46px rgba(17,24,39,0.26), 0 0 28px rgba(102,204,255,0.34); }
+        }
+
+        @keyframes tyMarquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        @media (max-width: 1080px) {
+            .tianyi-hero {
+                grid-template-columns: 1fr;
+                gap: 34px;
+            }
+
+            .tianyi-motion-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 780px) {
+            .tianyi-shell {
+                width: min(100% - 22px, 1240px);
+                padding-top: 10px;
+            }
+
+            .tianyi-nav {
+                top: 10px;
+            }
+
+            .tianyi-nav-links a {
+                display: none;
+            }
+
+            .tianyi-hero {
+                min-height: auto;
+                padding: 54px 0 78px;
+            }
+
+            .tianyi-inline-cover {
+                width: 88px;
+                height: 44px;
+                margin: 0 6px;
+            }
+
+            .tianyi-player {
+                grid-template-columns: 1fr;
+            }
+
+            .tianyi-track-title {
+                font-size: 1.75rem;
+            }
+
+            .tianyi-section,
+            .tianyi-footer {
+                padding: 84px 0;
+            }
+
+            .tianyi-bento {
+                grid-template-columns: 1fr;
+            }
+
+            .ty-span-6,
+            .ty-span-4,
+            .ty-span-3 {
+                grid-column: auto;
+            }
+
+            .tianyi-accordion-card,
+            .tianyi-accordion-card:hover {
+                grid-template-columns: 86px minmax(0, 1fr);
+            }
+        }
+
+        @media (max-width: 520px) {
+            .tianyi-brand-text {
+                max-width: 128px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .tianyi-title {
+                font-size: 2.55rem;
+            }
+
+            .tianyi-lede {
+                font-size: 1rem;
+            }
+
+            .tianyi-stage {
+                padding: 10px;
+            }
+
+            .tianyi-visualizer {
+                height: 58px;
+                gap: 3px;
+                padding: 8px;
+            }
+
+            .tianyi-buttons {
+                grid-template-columns: 50px 66px 50px;
+                gap: 10px;
+            }
+
+            .tianyi-icon-btn {
+                width: 50px;
+                height: 50px;
+            }
+
+            .tianyi-icon-btn.play {
+                width: 66px;
+                height: 66px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 1ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 1ms !important;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="music-player">
-        <!-- 封面区域 (onerror 已替换为内联 SVG) -->
-        <div class="cover-section">
-            <img src="" alt="封面" class="cover-image" id="coverImg" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'300\' viewBox=\'0 0 24 24\' fill=\'%232f4050\'%3E%3Cpath d=\'M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z\' fill=\'%23ffffff\'/%3E%3C/svg%3E'">
-            <div class="track-info">
-                <div class="track-title" id="trackTitle">加载中...</div>
-                <div class="track-artist" id="trackArtist"></div>
+    <main class="tianyi-shell" id="tyTop">
+        <nav class="tianyi-nav" aria-label="页面导航">
+            <a class="tianyi-brand" href="#tyTop" aria-label="回到顶部">
+                <span class="tianyi-mark"><i class="fas fa-music" aria-hidden="true"></i></span>
+                <span class="tianyi-brand-text">Tianyi Radio</span>
+            </a>
+            <div class="tianyi-nav-links">
+                <a href="#tyPlaylist">歌单</a>
+                <a href="#tyMood">声场</a>
+                <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+                <span class="tianyi-status"><span class="tianyi-status-dot"></span><span id="tyNavStatus">待播放</span></span>
+            </div>
+        </nav>
+
+        <section class="tianyi-hero" id="tyPlayer">
+            <div class="tianyi-hero-copy ty-reveal-copy">
+                <h1 class="tianyi-title">洛天依的<span class="tianyi-inline-cover" aria-hidden="true"></span>博客歌单</h1>
+                <p class="tianyi-lede">清透声线、本地曲库和随旋律呼吸的封面舞台，给博客留一块安静发光的音乐角落。</p>
+                <div class="tianyi-actions">
+                    <button class="tianyi-btn primary" type="button" id="tyHeroPlayBtn">
+                        <i class="fas fa-play" aria-hidden="true"></i>
+                        <span>开始播放</span>
+                    </button>
+                    <a class="tianyi-btn secondary" href="#tyPlaylist">
+                        <i class="fas fa-list" aria-hidden="true"></i>
+                        <span>查看歌单</span>
+                    </a>
+                </div>
+            </div>
+
+            <section class="tianyi-stage" aria-label="音乐播放器">
+                <div class="tianyi-player">
+                    <div class="tianyi-cover-panel">
+                        <div class="tianyi-cover-shell">
+                            <img src="" alt="当前歌曲封面" class="tianyi-cover" id="tyCoverImg">
+                            <span class="tianyi-ring" aria-hidden="true"></span>
+                            <div class="tianyi-visualizer" id="tyVisualizer" aria-hidden="true"></div>
+                        </div>
+                    </div>
+
+                    <div class="tianyi-controls">
+                        <div>
+                            <div class="tianyi-track-title" id="tyTrackTitle">加载中...</div>
+                            <div class="tianyi-track-artist" id="tyTrackArtist"></div>
+                        </div>
+
+                        <div class="tianyi-progress">
+                            <div class="tianyi-time">
+                                <span id="tyCurrentTime">0:00</span>
+                                <span id="tyDurationTime">0:00</span>
+                            </div>
+                            <input type="range" class="tianyi-seek" id="tySeekSlider" value="0" step="0.1" min="0" max="100" aria-label="播放进度">
+                        </div>
+
+                        <div class="tianyi-buttons">
+                            <button class="tianyi-icon-btn" id="tyPrevBtn" type="button" aria-label="上一首">
+                                <i class="fas fa-backward-step" aria-hidden="true"></i>
+                            </button>
+                            <button class="tianyi-icon-btn play" id="tyPlayPauseBtn" type="button" aria-label="播放或暂停">
+                                <i class="fas fa-play" aria-hidden="true"></i>
+                            </button>
+                            <button class="tianyi-icon-btn" id="tyNextBtn" type="button" aria-label="下一首">
+                                <i class="fas fa-forward-step" aria-hidden="true"></i>
+                            </button>
+                        </div>
+
+                        <div class="tianyi-volume-box">
+                            <i class="fas fa-volume-high" aria-hidden="true"></i>
+                            <input type="range" class="tianyi-volume" id="tyVolumeSlider" min="0" max="1" step="0.01" value="0.8" aria-label="音量">
+                        </div>
+
+                        <div class="tianyi-playlist" id="tyPlaylist">
+                            <div class="tianyi-playlist-head">
+                                <span>播放列表</span>
+                                <span class="tianyi-count" id="tyPlaylistCount">0 首</span>
+                            </div>
+                            <ul class="tianyi-list" id="tyPlaylistContainer">
+                                <li class="tianyi-empty">加载列表中...</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <div class="tianyi-marquee" aria-hidden="true">
+            <div class="tianyi-marquee-track" id="tyMarqueeTrack">
+                <span>洛天依</span><span>博客音乐</span><span>本地歌单</span><span>虚拟歌姬</span>
+                <span>洛天依</span><span>博客音乐</span><span>本地歌单</span><span>虚拟歌姬</span>
             </div>
         </div>
 
-        <!-- 进度条 + 时间 -->
-        <div class="progress-area">
-            <div class="time-row">
-                <span id="currentTime">0:00</span>
-                <span id="durationTime">0:00</span>
+        <section class="tianyi-section" id="tyMood">
+            <h2 class="tianyi-section-title ty-reveal-copy">把曲库变成一座轻盈的小舞台</h2>
+            <p class="tianyi-copy ty-reveal-copy">从清晨到深夜，虚拟歌姬的声音在页面里慢慢亮起；每张封面都带着自己的光线和情绪。</p>
+
+            <div class="tianyi-bento">
+                <article class="tianyi-card tianyi-feature-cover ty-span-6 ty-reveal-card">
+                    <h3>这一首的颜色</h3>
+                    <p>封面里的光线落进页面，像一小块正在发声的舞台。</p>
+                </article>
+                <article class="tianyi-card ty-span-3 ty-reveal-card">
+                    <h3>本地曲库</h3>
+                    <span class="tianyi-metric" id="tyTrackMetric">0</span>
+                    <p>首歌候场，等待洛天依的声线被点亮。</p>
+                </article>
+                <article class="tianyi-card ty-span-3 ty-reveal-card">
+                    <h3>洛天依气质</h3>
+                    <p>青色像声线，玫粉像心跳，轻亮色留给副歌。</p>
+                </article>
+                <article class="tianyi-card ty-span-4 ty-reveal-card">
+                    <h3>封面收藏</h3>
+                    <p>小小头像排成一列，像歌单里的回忆切片。</p>
+                    <div class="tianyi-mini-covers" id="tyMiniCovers"></div>
+                </article>
+                <article class="tianyi-card ty-span-4 ty-reveal-card">
+                    <h3>随音乐呼吸</h3>
+                    <p>节奏起来时，光带、声波和封面会轻轻回应。</p>
+                </article>
+                <article class="tianyi-card ty-span-4 ty-reveal-card">
+                    <h3>博客友好</h3>
+                    <p>翻页间隙也能停一下，听一段属于博客的旋律。</p>
+                </article>
             </div>
-            <input type="range" class="seek-bar" id="seekSlider" value="0" step="0.1" min="0" max="100">
-        </div>
+        </section>
 
-        <!-- 主控制按钮 -->
-        <div class="control-buttons">
-            <button class="ctrl-btn" id="prevBtn"><i class="fas fa-backward-step"></i></button>
-            <button class="ctrl-btn play-pause" id="playPauseBtn"><i class="fas fa-play"></i></button>
-            <button class="ctrl-btn" id="nextBtn"><i class="fas fa-forward-step"></i></button>
-        </div>
+        <section class="tianyi-section">
+            <h2 class="tianyi-section-title ty-reveal-copy">每一首都留下自己的画面感</h2>
+            <p class="tianyi-copy ty-reveal-copy">每张封面都像一格分镜，轻轻掠过时，故事感会跟着旋律浮起来。</p>
+            <div class="tianyi-motion-grid">
+                <div class="tianyi-motion-copy ty-pin-copy">
+                    <h2>轻、亮、会动。</h2>
+                    <p>像一块浮在博客里的音乐屏幕；声音出现时，它只用很克制的方式发光。</p>
+                </div>
+                <div class="tianyi-accordion" id="tyAccordionStack"></div>
+            </div>
+        </section>
 
-        <!-- 音量控制条 -->
-        <div class="volume-wrapper">
-            <i class="fas fa-volume-high"></i>
-            <input type="range" class="volume-bar" id="volumeSlider" min="0" max="1" step="0.01" value="0.8">
-        </div>
-
-        <!-- 播放列表 (动态生成) -->
-        <div class="playlist">
-            <h4><i class="fas fa-list-music" style="margin-right: 6px;"></i> 播放列表</h4>
-            <ul class="playlist-items" id="playlistContainer">
-                <li style="padding: 20px; text-align: center; color: #4a5b6e;">加载列表中...</li>
-            </ul>
-        </div>
-        <footer>
-            ⚡ 供博客使用<br>
-            <a href="https://github.com" target="_blank">托管在 GitHub Pages</a>
+        <footer class="tianyi-footer">
+            <div class="tianyi-footer-panel">
+                <h2>让博客先唱一首洛天依。</h2>
+                <p>点下播放，让清透的合成声线先替页面开场。</p>
+                <div class="tianyi-footer-actions">
+                    <button class="tianyi-btn primary" type="button" id="tyFooterPlayBtn">
+                        <i class="fas fa-play" aria-hidden="true"></i>
+                        <span>播放当前歌曲</span>
+                    </button>
+                    <a class="tianyi-btn secondary" href="#tyTop">回到顶部</a>
+                </div>
+                <div class="tianyi-credit">For blog music storage and Luo Tianyi playlist.</div>
+            </div>
         </footer>
-    </div>
+    </main>
 
-    <!-- 隐藏的audio元素 -->
-    <audio id="audioPlayer" preload="metadata"></audio>
+    <audio id="tyAudioPlayer" preload="metadata"></audio>
+
 
     <script>
         (function() {
-            // DOM 元素
-            const audio = document.getElementById('audioPlayer');
-            const coverImg = document.getElementById('coverImg');
-            const trackTitle = document.getElementById('trackTitle');
-            const trackArtist = document.getElementById('trackArtist');
-            const playPauseBtn = document.getElementById('playPauseBtn');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const seekSlider = document.getElementById('seekSlider');
-            const volumeSlider = document.getElementById('volumeSlider');
-            const currentTimeSpan = document.getElementById('currentTime');
-            const durationSpan = document.getElementById('durationTime');
-            const playlistContainer = document.getElementById('playlistContainer');
+            const PLACEHOLDER_COVER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%2366ccff'/%3E%3Cstop offset='0.52' stop-color='%23315aff'/%3E%3Cstop offset='1' stop-color='%23ff6f9f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='600' height='600' fill='url(%23g)'/%3E%3Cpath d='M334 142v206c-18-14-42-22-70-22-58 0-104 34-104 76s46 76 104 76 104-34 104-76V212h90v-70H334z' fill='white' fill-opacity='.86'/%3E%3C/svg%3E";
 
-            // 状态变量
-            let tracks = [];                // 从 list.json 加载后转换
+            const root = document.documentElement;
+            const body = document.body;
+            const audio = document.getElementById("tyAudioPlayer");
+            const coverImg = document.getElementById("tyCoverImg");
+            const trackTitle = document.getElementById("tyTrackTitle");
+            const trackArtist = document.getElementById("tyTrackArtist");
+            const playPauseBtn = document.getElementById("tyPlayPauseBtn");
+            const heroPlayBtn = document.getElementById("tyHeroPlayBtn");
+            const footerPlayBtn = document.getElementById("tyFooterPlayBtn");
+            const prevBtn = document.getElementById("tyPrevBtn");
+            const nextBtn = document.getElementById("tyNextBtn");
+            const seekSlider = document.getElementById("tySeekSlider");
+            const volumeSlider = document.getElementById("tyVolumeSlider");
+            const currentTimeSpan = document.getElementById("tyCurrentTime");
+            const durationSpan = document.getElementById("tyDurationTime");
+            const playlistContainer = document.getElementById("tyPlaylistContainer");
+            const playlistCount = document.getElementById("tyPlaylistCount");
+            const visualizer = document.getElementById("tyVisualizer");
+            const marqueeTrack = document.getElementById("tyMarqueeTrack");
+            const miniCovers = document.getElementById("tyMiniCovers");
+            const accordionStack = document.getElementById("tyAccordionStack");
+            const trackMetric = document.getElementById("tyTrackMetric");
+            const navStatus = document.getElementById("tyNavStatus");
+
+            let tracks = [];
             let currentTrackIndex = 0;
             let isSeeking = false;
+            let audioContext = null;
+            let analyser = null;
+            let mediaSource = null;
+            let frequencyData = null;
+            let motionFrame = null;
 
-            // ---------- 辅助函数 ----------
             function formatTime(seconds) {
-                if (isNaN(seconds) || seconds < 0) return '0:00';
+                if (Number.isNaN(seconds) || seconds < 0) return "0:00";
                 const mins = Math.floor(seconds / 60);
                 const secs = Math.floor(seconds % 60);
-                return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
             }
 
-            function updatePlayPauseIcon(isPlaying) {
-                const icon = playPauseBtn.querySelector('i');
-                if (isPlaying) {
-                    icon.classList.remove('fa-play');
-                    icon.classList.add('fa-pause');
-                } else {
-                    icon.classList.remove('fa-pause');
-                    icon.classList.add('fa-play');
+            function cssUrl(path) {
+                const value = path ? new URL(path, window.location.href).href : PLACEHOLDER_COVER;
+                return `url("${value.replace(/"/g, "%22")}")`;
+            }
+
+            function setRangeFill(input, percent) {
+                const value = Math.max(0, Math.min(100, percent));
+                input.style.setProperty("--range-value", `${value}%`);
+            }
+
+            function buildVisualizer() {
+                visualizer.innerHTML = "";
+                for (let i = 0; i < 28; i += 1) {
+                    const bar = document.createElement("span");
+                    bar.style.setProperty("--i", i);
+                    bar.style.setProperty("--level", 0.18 + ((i % 5) * 0.06));
+                    visualizer.appendChild(bar);
                 }
             }
 
-            function highlightCurrentItem(index) {
-                document.querySelectorAll('.playlist-item').forEach((item, i) => {
-                    item.classList.toggle('active', i === index);
+            function updatePlayPauseIcon(isPlaying) {
+                const icons = [
+                    playPauseBtn.querySelector("i"),
+                    heroPlayBtn.querySelector("i"),
+                    footerPlayBtn.querySelector("i")
+                ];
+
+                icons.forEach(icon => {
+                    if (!icon) return;
+                    icon.classList.toggle("fa-play", !isPlaying);
+                    icon.classList.toggle("fa-pause", isPlaying);
                 });
+
+                heroPlayBtn.querySelector("span").textContent = isPlaying ? "暂停播放" : "开始播放";
+                footerPlayBtn.querySelector("span").textContent = isPlaying ? "暂停当前歌曲" : "播放当前歌曲";
+                body.classList.toggle("ty-playing", isPlaying);
+                navStatus.textContent = isPlaying ? "播放中" : "待播放";
+            }
+
+            function updateAmbient(track) {
+                const cover = track && track.cover ? track.cover : "";
+                root.style.setProperty("--ty-cover", cssUrl(cover));
+                document.title = track && track.title ? `${track.title} | 洛天依博客音乐台` : "洛天依博客音乐台";
+            }
+
+            function highlightCurrentItem(index) {
+                document.querySelectorAll(".tianyi-list-item").forEach((item, i) => {
+                    item.classList.toggle("active", i === index);
+                });
+            }
+
+            function updateMediaSession(track) {
+                if (!("mediaSession" in navigator) || !window.MediaMetadata || !track) return;
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: track.title,
+                    artist: track.artist,
+                    artwork: track.cover ? [{ src: track.cover, sizes: "512x512", type: "image/jpeg" }] : []
+                });
+                navigator.mediaSession.setActionHandler("previoustrack", prevTrack);
+                navigator.mediaSession.setActionHandler("nexttrack", nextTrack);
+                navigator.mediaSession.setActionHandler("play", playCurrent);
+                navigator.mediaSession.setActionHandler("pause", pauseCurrent);
             }
 
             function loadTrack(index) {
                 if (!tracks.length || index < 0 || index >= tracks.length) return;
                 const track = tracks[index];
-                coverImg.src = track.cover || '';
-                trackTitle.innerText = track.title || '未知标题';
-                trackArtist.innerText = track.artist || '未知艺术家';
+
+                coverImg.onerror = function() {
+                    coverImg.onerror = null;
+                    coverImg.src = PLACEHOLDER_COVER;
+                };
+                coverImg.src = track.cover || PLACEHOLDER_COVER;
+                trackTitle.textContent = track.title || "未知标题";
+                trackArtist.textContent = track.artist || "未知艺术家";
                 audio.src = track.src;
                 audio.load();
                 seekSlider.value = 0;
-                currentTimeSpan.innerText = '0:00';
-                durationSpan.innerText = '0:00';
+                setRangeFill(seekSlider, 0);
+                currentTimeSpan.textContent = "0:00";
+                durationSpan.textContent = "0:00";
                 highlightCurrentItem(index);
+                updateAmbient(track);
+                updateMediaSession(track);
                 updatePlayPauseIcon(false);
             }
 
-            // 渲染播放列表（注意缩略图的 onerror 已改为内联 SVG）
+            function createThumb(src, alt) {
+                const image = document.createElement("img");
+                image.src = src || PLACEHOLDER_COVER;
+                image.alt = alt || "";
+                image.onerror = function() {
+                    image.onerror = null;
+                    image.src = PLACEHOLDER_COVER;
+                };
+                return image;
+            }
+
             function renderPlaylist() {
+                playlistContainer.innerHTML = "";
+                playlistCount.textContent = `${tracks.length} 首`;
+                trackMetric.textContent = tracks.length;
+
                 if (!tracks.length) {
-                    playlistContainer.innerHTML = '<li style="padding: 20px; text-align: center; color: #b00;">暂无歌曲</li>';
+                    const empty = document.createElement("li");
+                    empty.className = "tianyi-empty";
+                    empty.textContent = "暂无歌曲";
+                    playlistContainer.appendChild(empty);
                     return;
                 }
-                let html = '';
-                tracks.forEach((track, idx) => {
-                    html += `
-                        <li class="playlist-item" data-index="${idx}">
-                            <img src="${track.cover}" alt="thumb" class="item-cover-thumb" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'%232f4050\'%3E%3Cpath d=\'M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z\' fill=\'%23ffffff\'/%3E%3C/svg%3E'">
-                            <div class="item-info">
-                                <div class="item-title">${track.title}</div>
-                                <div class="item-artist">${track.artist}</div>
-                            </div>
-                        </li>
-                    `;
-                });
-                playlistContainer.innerHTML = html;
 
-                document.querySelectorAll('.playlist-item').forEach(item => {
-                    item.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'), 10);
-                        if (index === currentTrackIndex) {
+                tracks.forEach((track, idx) => {
+                    const li = document.createElement("li");
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "tianyi-list-item";
+                    button.dataset.index = String(idx);
+                    button.setAttribute("aria-label", `播放 ${track.title}`);
+
+                    const thumb = createThumb(track.cover, `${track.title} 封面`);
+                    thumb.className = "tianyi-thumb";
+
+                    const info = document.createElement("span");
+                    info.className = "tianyi-info";
+
+                    const title = document.createElement("span");
+                    title.className = "tianyi-song";
+                    title.textContent = track.title;
+
+                    const artist = document.createElement("span");
+                    artist.className = "tianyi-artist";
+                    artist.textContent = track.artist;
+
+                    const wave = document.createElement("span");
+                    wave.className = "tianyi-wave";
+                    wave.innerHTML = "<i class=\"fas fa-wave-square\" aria-hidden=\"true\"></i>";
+
+                    info.append(title, artist);
+                    button.append(thumb, info, wave);
+                    li.appendChild(button);
+                    playlistContainer.appendChild(li);
+
+                    button.addEventListener("click", function() {
+                        const nextIndex = Number(this.dataset.index);
+                        if (nextIndex === currentTrackIndex) {
                             togglePlayPause();
-                        } else {
-                            currentTrackIndex = index;
-                            loadTrack(currentTrackIndex);
-                            audio.play().then(() => updatePlayPauseIcon(true)).catch(() => {});
+                            return;
                         }
+                        currentTrackIndex = nextIndex;
+                        loadTrack(currentTrackIndex);
+                        playCurrent();
                     });
                 });
+            }
+
+            function renderMarquee() {
+                const names = tracks.length ? tracks.map(track => track.title) : ["洛天依", "博客音乐", "本地歌单", "虚拟歌姬"];
+                marqueeTrack.innerHTML = "";
+                names.concat(names).forEach(name => {
+                    const span = document.createElement("span");
+                    span.textContent = name;
+                    marqueeTrack.appendChild(span);
+                });
+            }
+
+            function renderMiniCovers() {
+                miniCovers.innerHTML = "";
+                tracks.slice(0, 5).forEach(track => {
+                    const image = createThumb(track.cover, `${track.title} 封面`);
+                    miniCovers.appendChild(image);
+                });
+            }
+
+            function renderAccordion() {
+                accordionStack.innerHTML = "";
+                tracks.slice(0, 4).forEach(track => {
+                    const article = document.createElement("article");
+                    article.className = "tianyi-accordion-card ty-reveal-card";
+
+                    const image = createThumb(track.cover, `${track.title} 封面`);
+                    const content = document.createElement("div");
+                    const title = document.createElement("h3");
+                    const copy = document.createElement("p");
+
+                    title.textContent = track.title;
+                    copy.textContent = `${track.artist || "未知艺术家"} 的曲目正在歌单里等待播放。`;
+                    content.append(title, copy);
+                    article.append(image, content);
+                    accordionStack.appendChild(article);
+                });
+            }
+
+            function setupAudioMotion() {
+                if (audioContext && analyser) return Promise.resolve();
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return Promise.resolve();
+
+                try {
+                    audioContext = new AudioContext();
+                    analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 128;
+                    frequencyData = new Uint8Array(analyser.frequencyBinCount);
+                    mediaSource = audioContext.createMediaElementSource(audio);
+                    mediaSource.connect(analyser);
+                    analyser.connect(audioContext.destination);
+                } catch (error) {
+                    analyser = null;
+                    console.warn("音频动效初始化失败:", error);
+                }
+
+                if (audioContext && audioContext.state === "suspended") {
+                    return audioContext.resume().catch(() => {});
+                }
+                return Promise.resolve();
+            }
+
+            function renderAudioMotion() {
+                if (!analyser || !frequencyData) return;
+                analyser.getByteFrequencyData(frequencyData);
+                const bars = visualizer.querySelectorAll("span");
+                let total = 0;
+
+                bars.forEach((bar, index) => {
+                    const position = Math.floor((index / bars.length) * frequencyData.length);
+                    const value = frequencyData[position] / 255;
+                    total += value;
+                    bar.style.setProperty("--level", Math.max(0.14, value).toFixed(3));
+                });
+
+                const energy = total / Math.max(1, bars.length);
+                root.style.setProperty("--ty-cover-scale", (1 + energy * 0.03).toFixed(3));
+                root.style.setProperty("--ty-glow", (0.18 + energy * 0.5).toFixed(3));
+                motionFrame = requestAnimationFrame(renderAudioMotion);
+            }
+
+            function startAudioMotion() {
+                if (!analyser || motionFrame) return;
+                renderAudioMotion();
+            }
+
+            function stopAudioMotion() {
+                if (motionFrame) {
+                    cancelAnimationFrame(motionFrame);
+                    motionFrame = null;
+                }
+                root.style.setProperty("--ty-cover-scale", "1");
+                root.style.setProperty("--ty-glow", "0.24");
+            }
+
+            async function playCurrent() {
+                if (!tracks.length) return;
+                try {
+                    await setupAudioMotion();
+                    await audio.play();
+                    updatePlayPauseIcon(true);
+                    startAudioMotion();
+                } catch (error) {
+                    console.warn("播放失败:", error);
+                    updatePlayPauseIcon(false);
+                }
+            }
+
+            function pauseCurrent() {
+                audio.pause();
+                updatePlayPauseIcon(false);
+                stopAudioMotion();
             }
 
             function togglePlayPause() {
                 if (audio.paused) {
-                    audio.play().then(() => updatePlayPauseIcon(true)).catch(e => {
-                        console.warn('播放失败:', e);
-                        updatePlayPauseIcon(false);
-                    });
+                    playCurrent();
                 } else {
-                    audio.pause();
-                    updatePlayPauseIcon(false);
+                    pauseCurrent();
                 }
             }
 
             function prevTrack() {
                 if (!tracks.length) return;
+                const shouldPlay = !audio.paused;
                 currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
                 loadTrack(currentTrackIndex);
-                audio.play().then(() => updatePlayPauseIcon(true)).catch(() => {});
+                if (shouldPlay) playCurrent();
             }
 
             function nextTrack() {
                 if (!tracks.length) return;
+                const shouldPlay = !audio.paused;
                 currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
                 loadTrack(currentTrackIndex);
-                audio.play().then(() => updatePlayPauseIcon(true)).catch(() => {});
+                if (shouldPlay) playCurrent();
             }
 
-            // 从 list.json 加载并转换数据
             async function loadPlaylistFromJSON() {
                 try {
-                    const response = await fetch('list.json');
+                    const response = await fetch("list.json");
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const rawData = await response.json();
-                    // 将原始数据映射为内部统一的格式 (title, artist, cover, src)
-                    tracks = rawData.map(item => ({
-                        title: item.name || '未知名称',
-                        artist: item.artist || '未知艺术家',
-                        cover: item.cover || '',
-                        src: item.url || ''
-                    }));
+                    tracks = rawData
+                        .filter(item => item && item.url)
+                        .map(item => ({
+                            title: item.name || "未知名称",
+                            artist: item.artist || "未知艺术家",
+                            cover: item.cover || "",
+                            src: item.url || ""
+                        }));
+
                     renderPlaylist();
-                    if (tracks.length > 0) {
-                        loadTrack(0);
-                    } else {
-                        throw new Error('列表为空');
-                    }
+                    renderMarquee();
+                    renderMiniCovers();
+                    renderAccordion();
+
+                    if (!tracks.length) throw new Error("列表为空");
+                    loadTrack(0);
+                    initScrollMotion();
                 } catch (error) {
-                    console.error('加载音乐列表失败：', error);
-                    playlistContainer.innerHTML = `<li style="padding: 20px; text-align: center; color: #b00;">
-                        加载 list.json 失败，请检查文件是否存在且格式正确。<br>
-                        ${error.message}
-                    </li>`;
+                    console.error("加载音乐列表失败:", error);
+                    playlistContainer.innerHTML = "";
+                    const empty = document.createElement("li");
+                    empty.className = "tianyi-empty";
+                    empty.textContent = `加载 list.json 失败，请检查文件是否存在且格式正确。${error.message}`;
+                    playlistContainer.appendChild(empty);
+                    trackTitle.textContent = "列表读取失败";
+                    trackArtist.textContent = error.message;
                 }
             }
 
             function bindEvents() {
-                playPauseBtn.addEventListener('click', togglePlayPause);
-                prevBtn.addEventListener('click', prevTrack);
-                nextBtn.addEventListener('click', nextTrack);
+                playPauseBtn.addEventListener("click", togglePlayPause);
+                heroPlayBtn.addEventListener("click", togglePlayPause);
+                footerPlayBtn.addEventListener("click", togglePlayPause);
+                prevBtn.addEventListener("click", prevTrack);
+                nextBtn.addEventListener("click", nextTrack);
 
-                seekSlider.addEventListener('input', function() {
+                seekSlider.addEventListener("input", function() {
                     isSeeking = true;
+                    setRangeFill(seekSlider, Number(this.value));
                     if (audio.duration) {
-                        const previewTime = (this.value / 100) * audio.duration;
-                        currentTimeSpan.innerText = formatTime(previewTime);
+                        const previewTime = (Number(this.value) / 100) * audio.duration;
+                        currentTimeSpan.textContent = formatTime(previewTime);
                     }
                 });
-                seekSlider.addEventListener('change', function() {
+
+                seekSlider.addEventListener("change", function() {
                     if (audio.duration) {
-                        audio.currentTime = (this.value / 100) * audio.duration;
+                        audio.currentTime = (Number(this.value) / 100) * audio.duration;
                     }
                     isSeeking = false;
                 });
 
-                volumeSlider.addEventListener('input', function() {
-                    audio.volume = this.value;
+                volumeSlider.addEventListener("input", function() {
+                    audio.volume = Number(this.value);
+                    setRangeFill(volumeSlider, Number(this.value) * 100);
                 });
 
-                audio.addEventListener('timeupdate', function() {
+                audio.addEventListener("timeupdate", function() {
                     if (!isSeeking && audio.duration) {
                         const percent = (audio.currentTime / audio.duration) * 100;
                         seekSlider.value = percent;
-                        currentTimeSpan.innerText = formatTime(audio.currentTime);
+                        setRangeFill(seekSlider, percent);
+                        currentTimeSpan.textContent = formatTime(audio.currentTime);
                     }
                 });
-                audio.addEventListener('loadedmetadata', function() {
-                    durationSpan.innerText = formatTime(audio.duration);
-                });
-                audio.addEventListener('ended', function() {
-                    if (tracks.length) {
-                        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-                        loadTrack(currentTrackIndex);
-                        updatePlayPauseIcon(false);
-                    }
-                });
-                audio.addEventListener('play', () => updatePlayPauseIcon(true));
-                audio.addEventListener('pause', () => updatePlayPauseIcon(false));
 
-                audio.volume = volumeSlider.value;
+                audio.addEventListener("loadedmetadata", function() {
+                    durationSpan.textContent = formatTime(audio.duration);
+                });
+
+                audio.addEventListener("ended", function() {
+                    if (!tracks.length) return;
+                    currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+                    loadTrack(currentTrackIndex);
+                    playCurrent();
+                });
+
+                audio.addEventListener("play", function() {
+                    updatePlayPauseIcon(true);
+                    startAudioMotion();
+                });
+
+                audio.addEventListener("pause", function() {
+                    updatePlayPauseIcon(false);
+                    stopAudioMotion();
+                });
+
+                audio.volume = Number(volumeSlider.value);
+                setRangeFill(volumeSlider, Number(volumeSlider.value) * 100);
             }
 
-            loadPlaylistFromJSON();
+            function initScrollMotion() {
+                if (!window.gsap || !window.ScrollTrigger) return;
+                window.gsap.registerPlugin(window.ScrollTrigger);
+
+                window.gsap.from(".ty-reveal-copy", {
+                    y: 34,
+                    opacity: 0,
+                    duration: 0.9,
+                    stagger: 0.12,
+                    ease: "power3.out"
+                });
+
+                window.gsap.utils.toArray(".ty-reveal-card").forEach(card => {
+                    window.gsap.fromTo(card,
+                        { scale: 0.94, opacity: 0.38 },
+                        {
+                            scale: 1,
+                            opacity: 1,
+                            ease: "none",
+                            scrollTrigger: {
+                                trigger: card,
+                                start: "top 88%",
+                                end: "bottom 18%",
+                                scrub: true
+                            }
+                        }
+                    );
+                });
+
+                if (window.matchMedia("(min-width: 781px)").matches) {
+                    window.ScrollTrigger.create({
+                        trigger: ".tianyi-motion-grid",
+                        start: "top 18%",
+                        end: "bottom 76%",
+                        pin: ".ty-pin-copy",
+                        pinSpacing: false
+                    });
+                }
+            }
+
+            buildVisualizer();
             bindEvents();
+            loadPlaylistFromJSON();
         })();
     </script>
 </body>
 </html>
+
